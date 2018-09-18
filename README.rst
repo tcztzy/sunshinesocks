@@ -11,7 +11,7 @@ Install
 
 ::
 
-    python setup.py install
+    pip install sunshinesocks
 
 License
 -------
