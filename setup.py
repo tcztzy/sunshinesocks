@@ -1,11 +1,33 @@
+import sys
+
 from setuptools import setup
+
+CURRENT_PYTHON = sys.version_info[:2]
+REQUIRED_PYTHON = (3, 5)
+
+if CURRENT_PYTHON < REQUIRED_PYTHON:
+    sys.stderr.write("""
+==========================
+Unsupported Python version
+==========================
+SunshineSocks requires Python {}.{}, but you're trying to
+install it on Python {}.{}.
+This may be because you are using a version of pip that doesn't
+understand the python_requires classifier. Make sure you
+have pip >= 9.0 and setuptools >= 24.2:
+    $ python -m pip install --upgrade pip setuptools
+""".format(*(REQUIRED_PYTHON + CURRENT_PYTHON)))
+    sys.exit(1)
+
+version = __import__('sunshinesocks').__version__
 
 with open('README.rst', encoding='utf-8') as fp:
     readme = fp.read()
 
 setup(
     name="sunshinesocks",
-    version="0.1.0",
+    version=version,
+    python_requires='>={}.{}'.format(*REQUIRED_PYTHON),
     license='https://www.gnu.org/licenses/gpl-3.0.en.html',
     description="A fast and modern tunnel proxy that help you.",
     author='tcztzy',
