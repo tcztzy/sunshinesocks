@@ -20,6 +20,7 @@ have pip >= 9.0 and setuptools >= 24.2:
     sys.exit(1)
 
 version = __import__('sunshinesocks').__version__
+description = __import__('sunshinesocks').__doc__
 
 with open('README.rst', encoding='utf-8') as fp:
     readme = fp.read()
@@ -29,7 +30,7 @@ setup(
     version=version,
     python_requires='>={}.{}'.format(*REQUIRED_PYTHON),
     license='https://www.gnu.org/licenses/gpl-3.0.en.html',
-    description="A fast and modern tunnel proxy that help you.",
+    description=description,
     author='tcztzy',
     author_email='tcztzy@gmail.com',
     url='https://github.com/tcztzy/sunshinesocks',
@@ -38,7 +39,7 @@ setup(
         'sunshinesocks': ['README.rst', 'LICENSE']
     },
     install_requires=[
-        'uvloop; implementation_name == "cpython" and platform_system != "Windows"'
+        'uvloop; platform_system != "Windows"'
     ],
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
