@@ -1,5 +1,8 @@
-import argparse
-from argparse import FileType, SUPPRESS
+from argparse import (ArgumentParser,
+                      RawTextHelpFormatter,
+                      ArgumentDefaultsHelpFormatter,
+                      FileType,
+                      SUPPRESS)
 from ipaddress import ip_address
 
 import sunshinesocks
@@ -51,12 +54,12 @@ METHOD_CHOICES = (
 )
 
 
-class SunshineSocksHelpFormatter(argparse.RawTextHelpFormatter,
-                                 argparse.ArgumentDefaultsHelpFormatter):
+class SunshineSocksHelpFormatter(RawTextHelpFormatter,
+                                 ArgumentDefaultsHelpFormatter):
     pass
 
 
-class SunshineSocksArgumentParser(argparse.ArgumentParser):
+class SunshineSocksArgumentParser(ArgumentParser):
     def __init__(self):
         super().__init__(
             prog='sunshinesocks',
@@ -73,7 +76,8 @@ class SunshineSocksArgumentParser(argparse.ArgumentParser):
     def add_proxy_option_argument_group(self):
         group = self.add_argument_group('Proxy Option')
         group.add_argument('-c', type=FileType('r', encoding='UTF-8'),
-                           metavar='CONFIG', help='path to config file'),
+                           metavar='CONFIG', help='path to config file',
+                           default=SUPPRESS)
         group.add_argument('-s', dest='server', type=ip_address,
                            metavar='SERVER_ADDR',
                            default=ip_address('0.0.0.0'),
@@ -107,3 +111,8 @@ class SunshineSocksArgumentParser(argparse.ArgumentParser):
                            help='quiet mode, -qq for higher level')
         group.add_argument('--version', action='version',
                            version=f'%(prog)s {sunshinesocks.__version__}')
+
+
+if __name__ == '__main__':
+    parser = SunshineSocksArgumentParser()
+    parser.parse_args()
