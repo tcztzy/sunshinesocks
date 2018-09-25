@@ -1,3 +1,4 @@
+import sys
 from argparse import (ArgumentParser,
                       RawTextHelpFormatter,
                       ArgumentDefaultsHelpFormatter,
@@ -69,8 +70,8 @@ class Role(Enum):
     CLIENT = 'client'
 
 
-def _init_parser(_parser, role: Role):
-    group = _parser.add_argument_group('Proxy Option')
+def _init_parser(self, role: Role):
+    group = self.add_argument_group('Proxy Option')
     group.add_argument('-c', type=FileType('r', encoding='UTF-8'),
                        metavar='CONFIG', help='path to config file',
                        default=SUPPRESS)
@@ -105,7 +106,7 @@ def _init_parser(_parser, role: Role):
     group.add_argument('--prefer-ipv6', action='store_true', default=SUPPRESS,
                        help='resolve ipv6 address first')
 
-    group = _parser.add_argument_group('General Option')
+    group = self.add_argument_group('General Option')
     group.add_argument('-h', '--help', action='help',
                        help='show this help message and exit')
     if ENABLE_DAEMON:
@@ -127,28 +128,48 @@ def _init_parser(_parser, role: Role):
 
 parser = ArgumentParser(description=SUNSHINESOCKS_DESCRIPTION,
                         formatter_class=SunshineSocksHelpFormatter,
-                        # add_help=False,
-                        epilog='Online help: '
+                        add_help=False,
+                        usage='%(prog)s [-h] [--version] <command> [<args>]',
+                        epilog='See %(prog)s help <command> to read about a '
+                               'specific subcommand.\nOnline help: '
                                '<https://github.com/tcztzy/sunshinesocks>')
-subparsers = parser.add_subparsers(dest='subcommand', help='hehe')
+parser.add_argument('-h', '--help', action='help', help=SUPPRESS)
+parser.add_argument('--version', action='version', help=SUPPRESS,
+                    version=f'%(prog)s {sunshinesocks.__version__}')
+subparsers = parser.add_subparsers(dest='command', title='command', metavar='')
 server_parser = subparsers.add_parser(
     'server', description=SUNSHINESOCKS_DESCRIPTION,
-    formatter_class=SunshineSocksHelpFormatter, add_help=False
+    formatter_class=SunshineSocksHelpFormatter, add_help=False,
+    help='sunshinesocks server.'
 )
 _init_parser(server_parser, Role.SERVER)
 client_parser = subparsers.add_parser(
     'client', description=SUNSHINESOCKS_DESCRIPTION,
-    formatter_class=SunshineSocksHelpFormatter, add_help=False
+    formatter_class=SunshineSocksHelpFormatter, add_help=False,
+    help='sunshinesocks client.'
 )
 _init_parser(client_parser, Role.CLIENT)
 help_parser = subparsers.add_parser('help', add_help=False)
-help_parser.add_argument('subcommand-help')
+help_parser.add_argument('command_help', nargs='?', metavar='<command>')
 
 
-def main():
+def main(args=None, namespace=None):
     parser.parse_args()
-    args = parser.parse_args()
-    print(vars(args))
+    args = parser.parse_args(args, namespace)
+
+    if args.command is None:
+        parser.print_help()
+    elif args.command == 'help':
+        if args.command_help is None:
+            parser.print_help()
+        elif args.command_help == 'server':
+            server_parser.print_help()
+        elif args.command_help == 'client':
+            client_parser.print_help()
+        else:
+            sys.stderr.write(f'Invalid command {args.command_help}, '
+                             'please check it out.')
+            exit(1)
 
 
 if __name__ == '__main__':
