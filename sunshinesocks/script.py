@@ -1,3 +1,4 @@
+import socket
 import sys
 from argparse import (ArgumentParser,
                       RawTextHelpFormatter,
@@ -7,9 +8,8 @@ from argparse import (ArgumentParser,
 from enum import Enum
 
 import sunshinesocks
+from sunshinesocks.server import main as server_main
 from sunshinesocks.utils import (port,
-                                 ENABLE_CLIENT_TFO,
-                                 ENABLE_SERVER_TFO,
                                  ENABLE_DAEMON,
                                  ENABLE_WORKER)
 
@@ -93,8 +93,7 @@ def _init_parser(self, role: Role):
                        metavar='TIMEOUT', help='timeout in second')
     group.add_argument('-a', dest='one-time-auth', action='store_true',
                        help='one time auth', default=SUPPRESS)
-    if (role == Role.SERVER and ENABLE_SERVER_TFO) or\
-            (role == Role.CLIENT and ENABLE_CLIENT_TFO):
+    if hasattr(socket, 'TCP_FASTOPEN'):  # Now Windows supports TCP_FASTOPEN
         group.add_argument('--fast-open', action='store_true',
                            default=SUPPRESS, help='use TCP_FASTOPEN')
     if role == Role.SERVER:
@@ -129,7 +128,6 @@ def _init_parser(self, role: Role):
 parser = ArgumentParser(description=SUNSHINESOCKS_DESCRIPTION,
                         formatter_class=SunshineSocksHelpFormatter,
                         add_help=False,
-                        usage='%(prog)s [-h] [--version] <command> [<args>]',
                         epilog='See %(prog)s help <command> to read about a '
                                'specific subcommand.\nOnline help: '
                                '<https://github.com/tcztzy/sunshinesocks>')
@@ -153,23 +151,30 @@ help_parser = subparsers.add_parser('help', add_help=False)
 help_parser.add_argument('command_help', nargs='?', metavar='<command>')
 
 
+def sunshinesocks_help(command_help):
+    if command_help is None:
+        parser.print_help()
+    elif command_help == 'server':
+        server_parser.print_help()
+    elif command_help == 'client':
+        client_parser.print_help()
+    else:
+        sys.stderr.write(f'Invalid command {command_help}, '
+                         'please check it out.\n')
+        exit(1)
+
+
 def main(args=None, namespace=None):
-    parser.parse_args()
     args = parser.parse_args(args, namespace)
 
     if args.command is None:
         parser.print_help()
     elif args.command == 'help':
-        if args.command_help is None:
-            parser.print_help()
-        elif args.command_help == 'server':
-            server_parser.print_help()
-        elif args.command_help == 'client':
-            client_parser.print_help()
-        else:
-            sys.stderr.write(f'Invalid command {args.command_help}, '
-                             'please check it out.')
-            exit(1)
+        sunshinesocks_help(args.command_help)
+    elif args.command == 'server':
+        server_main(vars(args))
+    elif args.command == 'client':
+        return
 
 
 if __name__ == '__main__':
