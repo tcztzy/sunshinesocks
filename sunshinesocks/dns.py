@@ -108,9 +108,7 @@ class DNSResponse:
 
 
 class DNSProtocol(asyncio.DatagramProtocol):
-    """
-    Flags
-    """
+
     def __init__(self, hostname, qtype):
         self._hostname = hostname
         self._qtype = qtype
