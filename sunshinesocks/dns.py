@@ -104,7 +104,7 @@ class DNSResponse:
         self.rcode = self.flags & 0x000f
 
     def __str__(self):
-        return '<{} {}>'.format(self.__class__.__name__, self.transaction_id)
+        return '<{} {:#06x}>'.format(self.__class__.__name__, self.transaction_id)
 
 
 class DNSProtocol(asyncio.DatagramProtocol):
