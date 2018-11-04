@@ -3,7 +3,7 @@ import sys
 
 __version__ = '0.1.1a0'
 
-MIN_PY_VER = (3, 5)
+MIN_PY_VER = (3, 6)
 
 if sys.version_info < MIN_PY_VER:
     raise RuntimeError(
