@@ -31,4 +31,4 @@ def port(raw):
     return var
 
 
-ENABLE_WORKER = ENABLE_DAEMON = os.name == 'posix'
+ENABLE_WORKER = os.name == 'posix'

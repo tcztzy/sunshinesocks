@@ -9,9 +9,7 @@ from enum import Enum
 
 import sunshinesocks
 from sunshinesocks.server import main as server_main
-from sunshinesocks.utils import (port,
-                                 ENABLE_DAEMON,
-                                 ENABLE_WORKER)
+from sunshinesocks.utils import port, ENABLE_WORKER
 
 SUNSHINESOCKS_DESCRIPTION = f'''\
 {sunshinesocks.__doc__}
@@ -108,15 +106,6 @@ def _init_parser(self, role: Role):
     group = self.add_argument_group('General Option')
     group.add_argument('-h', '--help', action='help',
                        help='show this help message and exit')
-    if ENABLE_DAEMON:
-        group.add_argument('-d', choices=('start', 'stop', 'restart'),
-                           default=SUPPRESS, help='daemon mode', dest='daemon')
-        group.add_argument('--pid-file', help='pid file for daemon mode',
-                           default=SUPPRESS)
-        group.add_argument('--log-file', help='log file for daemon mode',
-                           default=SUPPRESS)
-        group.add_argument('--user', help='username to run as',
-                           default=SUPPRESS)
     group.add_argument('-v', '--verbose', action='count', default=SUPPRESS,
                        help='verbose mode, -vv for higher level')
     group.add_argument('-q', '--quiet', action='count', default=SUPPRESS,
